@@ -7,12 +7,12 @@
 <tr>
 <td align="center">
 Explorer
-hi justin
+is it working?
 </td>
 </tr>
 <tr>
 <td>
-<canvas id="the_canvas" width=1000 height=800></canvas>
+<canvas id="the_canvas" width=1024 height=768></canvas>
 </td>
 </tr>
 <tr>
@@ -23,23 +23,63 @@ hi justin
 var position = [50, 50]
 var canvas = document.getElementById("the_canvas");
 var context = canvas.getContext("2d");
+var num_blocks = 50;
+var blocks = new Array(num_blocks);
+var assets = {};
+
+function InitializeWorld() {
+  var guy = new Image();
+  guy.src = "stick_guy.png";
+  assets["guy"] = guy;
+
+  var block = new Image();
+  block.src = "blocks/earth_block.png";
+  assets["blocks/earth"] = block;
+
+  block = new Image();
+  block.src = "blocks/top_block.png";
+  assets["blocks/top"] = block;
+
+  for (var x = 0; x < num_blocks; x++) {
+    blocks[x] = new Array(num_blocks);
+    for (var y = 0; y < num_blocks; y++) {
+      blocks[x][y] = (x + y) % 2;
+    }
+  }
+}
 
 function ClearScreen() {
   context.fillStyle = "rgba(200, 200, 200, 1)"
   context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
+function DrawBlocks() {
+  var block_size = 20;
+  for (var x = 0; x < num_blocks; x++) {
+    var row = blocks[x];
+    for (var y = 0; y < num_blocks; y++) {
+      var block = row[y];
+      if (block == 0) {
+        img = assets["blocks/earth"];
+      } else {
+        img = assets["blocks/top"];
+      }
+      context.drawImage(img, block_size * x, block_size * y, block_size, block_size);
+    }
+  }
+}
+
 function DrawGuy() {
-  img = new Image();
-  img.src = "stick_guy.png";
   canvas.width = img.width;
   canvas.height = img.height;
-  context.drawImage(img,position[0],position[1],80,80);
+  var guy_size = 20;
+  context.drawImage(assets["guy"], position[0], position[1], guy_size, guy_size);
 }
 
 function DrawScene() {
   ClearScreen();
-  DrawGuy();
+  DrawBlocks();
+  //DrawGuy();
   setTimeout("DrawScene();", 1);
 }
 
@@ -66,6 +106,7 @@ function handleArrowKeys(evt) {
 
 document.onkeyup = handleArrowKeys;
 
+InitializeWorld();
 DrawScene();
 
 </script>
