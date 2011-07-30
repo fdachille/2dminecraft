@@ -19,7 +19,7 @@ Explorer
 </table>
 <script type="text/javascript">
 
-var position = [50, 50]
+var position = [50, 50];
 var canvas = document.getElementById("the_canvas");
 var context = canvas.getContext("2d");
 var num_blocks = 50;
@@ -118,7 +118,18 @@ function handleArrowKeys(evt) {
   }
 }
 
+function getBlockXandY(e) {
+  return [
+    ((e.clientX - canvas.getBoundingClientRect().left) / block_size) | 0,
+    ((e.clientY - canvas.getBoundingClientRect().top) / block_size) | 0
+  ]
+}
+
 document.onkeyup = handleArrowKeys;
+canvas.addEventListener("click", function(e) {
+  var click_pos = getBlockXandY(e);
+  blocks[click_pos[0]][click_pos[1]] = 0;
+}, false);
 
 InitializeWorld();
 DrawScene();
