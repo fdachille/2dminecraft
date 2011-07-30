@@ -19,7 +19,7 @@ Explorer
 </table>
 <script type="text/javascript">
 
-var position = [50, 50];
+var position = [0, 0];
 var canvas = document.getElementById("the_canvas");
 var context = canvas.getContext("2d");
 var num_blocks = 50;
@@ -86,34 +86,78 @@ function DrawBlocks() {
 }
 
 function DrawGuy() {
-  var guy_size = 50;
-  context.drawImage(assets["guy"], position[0], position[1], guy_size, guy_size);
+  var guy_size = 40;
+  context.drawImage(assets["guy"],
+      block_size * position[0] - guy_size / 4,
+      block_size * position[1] - guy_size / 2,
+      guy_size, guy_size);
+}
+
+function DoPhysics() {
+  var guy_x = position[0];
+  var guy_y = position[1];
+  if (blocks[guy_x][guy_y] == 0 &&
+      blocks[guy_x][guy_y+1] == 0) {
+    position[1] += 1;
+  }
 }
 
 function DrawScene() {
+  DoPhysics();
   ClearScreen();
   DrawBlocks();
   DrawGuy();
   setTimeout("DrawScene();", 1);
 }
 
+function GetBlockAt(pos) {
+  return blocks[pos[0]][pos[1]];
+}
+
+function SetBlockAt(pos, value) {
+  blocks[pos[0]][pos[1]] = value;
+}
+
 function handleArrowKeys(evt) {
   evt = (evt) ? evt : ((window.event) ? event : null);
   if (evt) {
-    var speed = block_size;
+    var dir = [0, 0];
     switch (evt.keyCode) {
      case 37:
-       position[0] -= speed;
+       dir = [-1, 0];
        break;    
      case 38:
-       position[1] -= speed;
+       dir = [0, -1];
        break;    
      case 39:
-       position[0] += speed;
+       dir = [1, 0];
        break;    
      case 40:
-       position[1] += speed;
+       dir = [0, 1];
        break;    
+    }
+    var new_pos = [position[0] + dir[0], position[1] + dir[1]];
+    if (evt.altKey) {
+      // break
+      SetBlockAt(new_pos, 0);
+    } else if (evt.shiftKey) {
+      // add
+      if (GetBlockAt(new_pos) == 0) {
+        SetBlockAt(new_pos, 1);
+      } else if (evt.keyCode == 40) {
+        // add at current spot and move up, if possible
+        var above_pos = [position[0], position[1] - 1];
+        if (GetBlockAt(above_pos) == 0) {
+          SetBlockAt(position, 1);
+          position[1] -= 1;
+        }
+      }
+    } else {
+      // move
+      var new_pos = [position[0] + dir[0], position[1] + dir[1]];
+      if (GetBlockAt(new_pos) == 0) {
+        position = new_pos;
+      }
     }
   }
 }
