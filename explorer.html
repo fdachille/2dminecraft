@@ -7,7 +7,6 @@
 <tr>
 <td align="center">
 Explorer
-is it working?
 </td>
 </tr>
 <tr>
@@ -24,6 +23,7 @@ var position = [50, 50]
 var canvas = document.getElementById("the_canvas");
 var context = canvas.getContext("2d");
 var num_blocks = 50;
+var block_size = 20;
 var blocks = new Array(num_blocks);
 var assets = {};
 
@@ -40,10 +40,21 @@ function InitializeWorld() {
   block.src = "blocks/top_block.png";
   assets["blocks/top"] = block;
 
+  block = new Image();
+  block.src = "blocks/sky.png";
+  assets["blocks/sky"] = block;
+
   for (var x = 0; x < num_blocks; x++) {
     blocks[x] = new Array(num_blocks);
+    var top_height = 25;
     for (var y = 0; y < num_blocks; y++) {
-      blocks[x][y] = (x + y) % 2;
+      if (y < top_height) {
+        blocks[x][y] = 0;
+      } else if (y == top_height) {
+        blocks[x][y] = 2;
+      } else {
+        blocks[x][y] = 1;
+      }
     }
   }
 }
@@ -54,15 +65,20 @@ function ClearScreen() {
 }
 
 function DrawBlocks() {
-  var block_size = 20;
   for (var x = 0; x < num_blocks; x++) {
     var row = blocks[x];
     for (var y = 0; y < num_blocks; y++) {
       var block = row[y];
-      if (block == 0) {
-        img = assets["blocks/earth"];
-      } else {
-        img = assets["blocks/top"];
+      switch (block) {
+        case 0:
+          img = assets["blocks/sky"];
+          break;
+        case 1:
+          img = assets["blocks/earth"];
+          break;
+        case 2:
+          img = assets["blocks/top"];
+          break;
       }
       context.drawImage(img, block_size * x, block_size * y, block_size, block_size);
     }
@@ -70,23 +86,21 @@ function DrawBlocks() {
 }
 
 function DrawGuy() {
-  canvas.width = img.width;
-  canvas.height = img.height;
-  var guy_size = 20;
+  var guy_size = 50;
   context.drawImage(assets["guy"], position[0], position[1], guy_size, guy_size);
 }
 
 function DrawScene() {
   ClearScreen();
   DrawBlocks();
-  //DrawGuy();
+  DrawGuy();
   setTimeout("DrawScene();", 1);
 }
 
 function handleArrowKeys(evt) {
   evt = (evt) ? evt : ((window.event) ? event : null);
   if (evt) {
-    var speed = 5;
+    var speed = block_size;
     switch (evt.keyCode) {
      case 37:
        position[0] -= speed;
