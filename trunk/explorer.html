@@ -11,7 +11,7 @@ Explorer
 </tr>
 <tr>
 <td>
-<canvas id="the_canvas" width=1024 height=768></canvas>
+<canvas id="the_canvas" width=900 height=600></canvas>
 </td>
 </tr>
 <tr>
@@ -46,7 +46,7 @@ function InitializeWorld() {
 
   for (var x = 0; x < num_blocks; x++) {
     blocks[x] = new Array(num_blocks);
-    var top_height = 25;
+    var top_height = 15;
     for (var y = 0; y < num_blocks; y++) {
       if (y < top_height) {
         blocks[x][y] = 0;
@@ -107,7 +107,7 @@ function DrawScene() {
   ClearScreen();
   DrawBlocks();
   DrawGuy();
-  setTimeout("DrawScene();", 1);
+  setTimeout("DrawScene();", 100);
 }
 
 function GetBlockAt(pos) {
@@ -116,6 +116,47 @@ function GetBlockAt(pos) {
 
 function SetBlockAt(pos, value) {
   blocks[pos[0]][pos[1]] = value;
+}
+
+function FixColumn(x) {
+  var air = true;
+  var top = true;
+  for (var y = 0; y < num_blocks; y++) {
+    var in_air = blocks[x][y] == 0;
+    var in_dirt = blocks[x][y] == 1 || blocks[x][y] == 2;
+    if (in_dirt && !top) {
+      blocks[x][y] = 1;
+    }
+    if (in_dirt && air && top) {
+      blocks[x][y] = 2;
+      top = false;
+    }
+    if (in_air) {
+      air = true;
+      top = true;
+    }
+  }
+}
+
+function AddBlock(current_pos, add_pos) {
+  var add_below = (current_pos[0] == add_pos[0]) &&
+      (current_pos[1] == add_pos[1] - 1);
+  if (GetBlockAt(add_pos) == 0) {
+    SetBlockAt(add_pos, 1);
+  } else if (add_below) {
+    // add at current spot and move up, if possible
+    var above_pos = [current_pos[0], current_pos[1] - 1];
+    if (GetBlockAt(above_pos) == 0) {
+      SetBlockAt(current_pos, 1);
+      position[1] -= 1;
+    }
+  }
+  FixColumn(add_pos[0]);
+}
+
+function RemoveBlock(pos) {
+  SetBlockAt(pos, 0);
+  FixColumn(pos[0]);
 }
 
 function handleArrowKeys(evt) {
@@ -139,19 +180,10 @@ function handleArrowKeys(evt) {
     var new_pos = [position[0] + dir[0], position[1] + dir[1]];
     if (evt.altKey) {
       // break
-      SetBlockAt(new_pos, 0);
+      RemoveBlock(new_pos);
     } else if (evt.shiftKey) {
       // add
-      if (GetBlockAt(new_pos) == 0) {
-        SetBlockAt(new_pos, 1);
-      } else if (evt.keyCode == 40) {
-        // add at current spot and move up, if possible
-        var above_pos = [position[0], position[1] - 1];
-        if (GetBlockAt(above_pos) == 0) {
-          SetBlockAt(position, 1);
-          position[1] -= 1;
-        }
-      }
+      AddBlock(position, new_pos, evt.keyCode == 40);
     } else {
       // move
       var new_pos = [position[0] + dir[0], position[1] + dir[1]];
@@ -172,7 +204,11 @@ function getBlockXandY(e) {
 document.onkeyup = handleArrowKeys;
 canvas.addEventListener("click", function(e) {
   var click_pos = getBlockXandY(e);
-  blocks[click_pos[0]][click_pos[1]] = 0;
+  if (e.shiftKey) {
+    AddBlock(position, click_pos);
+  } else {
+    RemoveBlock(click_pos);
+  }
 }, false);
 
 InitializeWorld();
