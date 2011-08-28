@@ -46,16 +46,18 @@ function InitializeWorld() {
   block.src = "blocks/sky.png";
   assets["blocks/sky"] = block;
 
+  var top_height = 15;
   for (var x = 0; x < num_blocks; x++) {
     blocks[x] = new Array(num_blocks);
-    var top_height = 15 + 5 * Math.random();
+    var delta = 1;
+    top_height += 2 * delta * Math.random() - delta;
     for (var y = 0; y < num_blocks; y++) {
       if (y < top_height) {
         blocks[x][y] = 0;
-      } else if (y == top_height) {
-        blocks[x][y] = 2;
-      } else {
+      } else if (y > top_height + 1) {
         blocks[x][y] = 1;
+      } else {
+        blocks[x][y] = 2;
       }
     }
   }
