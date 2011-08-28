@@ -68,8 +68,8 @@ function InitializeWorld() {
 }
 
 function ClearScreen() {
-  context.fillStyle = "rgba(200, 200, 200, 1)"
-  context.fillRect(0, 0, canvas.width, canvas.height);
+  //context.fillStyle = "rgba(200, 200, 200, 1)"
+  //context.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function DrawBlocks() {
@@ -114,7 +114,20 @@ function DoPhysics() {
 }
 
 function DrawLegend() {
-  
+  var blocks = ["blocks/earth", "blocks/wood"];
+  var num_blocks = 2;
+  var mid_x = canvas.width/2;
+  var border = 2;
+  var left = mid_x - blocks.length * (block_size + 2 * border);
+  var top = canvas.height - block_size - 2 * border;
+  var x = left;
+  for (var i = 0; i < 2; i++) {
+    var img = assets[blocks[i]];
+    context.fillStyle = "rgba(128, 128, 128, 1)"
+    context.fillRect(x, top, block_size + 2 * border, block_size + 2 * border);
+    context.drawImage(img, x + border, top + border, block_size, block_size);
+    x += block_size + 2 * border;
+  }
 }
 
 function DrawScene() {
