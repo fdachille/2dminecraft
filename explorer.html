@@ -12,6 +12,8 @@ Explorer
 <tr>
 <td>
 <canvas id="the_canvas" width=900 height=600></canvas>
+<audio id="add_block_sound" src="http://rpg.hamsterrepublic.com/wiki-images/0/04/TextboxBloop8-Bit.ogg" preload="auto" autobuffer></audio>
+<audio id="remove_block_sound" src="http://rpg.hamsterrepublic.com/wiki-images/3/3a/Thip.ogg" preload="auto" autobuffer></audio>
 </td>
 </tr>
 <tr>
@@ -116,6 +118,13 @@ function GetBlockAt(pos) {
 
 function SetBlockAt(pos, value) {
   blocks[pos[0]][pos[1]] = value;
+  var sound;
+  if (value === 0) {
+    sound = document.getElementById("remove_block_sound");
+  } else {
+    sound = document.getElementById("add_block_sound");
+  }
+  sound.play();
 }
 
 function FixColumn(x) {
