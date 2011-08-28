@@ -46,6 +46,10 @@ function InitializeWorld() {
   block.src = "blocks/sky.png";
   assets["blocks/sky"] = block;
 
+  block = new Image();
+  block.src = "blocks/wood.png";
+  assets["blocks/wood"] = block;
+
   var top_height = 15;
   for (var x = 0; x < num_blocks; x++) {
     blocks[x] = new Array(num_blocks);
@@ -83,6 +87,9 @@ function DrawBlocks() {
         case 2:
           img = assets["blocks/top"];
           break;
+        case 3:
+          img = assets["blocks/wood"];
+          break;
       }
       context.drawImage(img, block_size * x, block_size * y, block_size, block_size);
     }
@@ -106,11 +113,16 @@ function DoPhysics() {
   }
 }
 
+function DrawLegend() {
+  
+}
+
 function DrawScene() {
   DoPhysics();
   ClearScreen();
   DrawBlocks();
   DrawGuy();
+  DrawLegend();
   setTimeout("DrawScene();", 100);
 }
 
@@ -170,6 +182,20 @@ function RemoveBlock(pos) {
   FixColumn(pos[0]);
 }
 
+function handleKeyDown(evt) {
+  evt = (evt) ? evt : ((window.event) ? event : null);
+  if (evt) {
+    switch (evt.keyCode) {
+     case 32:  // spacebar
+       position[1] -= 3;
+       if (position[1] < 0) {
+         position[1] = 0;
+       }
+       break;
+    }
+  }
+}
+
 function handleArrowKeys(evt) {
   evt = (evt) ? evt : ((window.event) ? event : null);
   if (evt) {
@@ -177,16 +203,16 @@ function handleArrowKeys(evt) {
     switch (evt.keyCode) {
      case 37:
        dir = [-1, 0];
-       break;    
+       break;
      case 38:
        dir = [0, -1];
-       break;    
+       break;
      case 39:
        dir = [1, 0];
-       break;    
+       break;
      case 40:
        dir = [0, 1];
-       break;    
+       break;
     }
     var new_pos = [position[0] + dir[0], position[1] + dir[1]];
     if (evt.altKey) {
@@ -212,6 +238,7 @@ function getBlockXandY(e) {
   ]
 }
 
+document.onkeydown = handleKeyDown;
 document.onkeyup = handleArrowKeys;
 canvas.addEventListener("click", function(e) {
   var click_pos = getBlockXandY(e);
