@@ -48,7 +48,7 @@ function InitializeWorld() {
 
   for (var x = 0; x < num_blocks; x++) {
     blocks[x] = new Array(num_blocks);
-    var top_height = 15;
+    var top_height = 15 + 5 * Math.random();
     for (var y = 0; y < num_blocks; y++) {
       if (y < top_height) {
         blocks[x][y] = 0;
